@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form validation</title>
+    <link rel="stylesheet" href="./assets/css/main.css">
+</head>
+<body>
+    <div class="main">
+
+        <form action="" method="POST" class="form" id="form-1">
+          <h3 class="heading">Create an Account</h3>
+          <p class="desc">Complete the form below to register for a member account ❤️</p>
+      
+          <div class="spacer"></div>
+      
+          <div class="form-group">
+            <label for="fullname" class="form-label">Full Name</label>
+            <input id="fullname" name="fullname" type="text" placeholder="E.g: Quoc Hieu" class="form-control">
+            <span class="form-message"></span>
+          </div>
+      
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" name="email" type="text" placeholder="E.g: email@domain.com" class="form-control">
+            <span class="form-message"></span>
+          </div>
+      
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input id="password" name="password" type="password" placeholder="Password" class="form-control">
+            <span class="form-message"></span>
+          </div>
+      
+          <div class="form-group">
+            <label for="password_confirmation" class="form-label">Repeat Password</label>
+            <input id="password_confirmation" name="password_confirmation" placeholder="Repeat Password" type="password" class="form-control">
+            <span class="form-message"></span>
+          </div>
+      
+          <button class="form-submit">Create</button>
+        </form>
+        
+        <!-- js -->
+        <script src="./assets/js/index.js"></script>
+        <script>
+          validator ({
+            form: '#form-1',
+            errorSelector: '.form-message',
+            rules: [
+              validator.isRequired('#fullname'),
+              validator.isEmail('#email'),
+              validator.password('#password',6),
+            ]
+          })
+        </script>
+      </div>
+</body>
+</html>
