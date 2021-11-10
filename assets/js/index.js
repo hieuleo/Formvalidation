@@ -30,23 +30,23 @@ function errorMessage (inputElement, rule, options) {
 
 // rule      
     // full name validator
-validator.isRequired = function (selector) {
+validator.isRequired = function (selector, message) {
     return {
         selector,
         test: function (value) {
             let regex = /[^a-z0-9A-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/u;
-            return regex.test(value.trim()) ? undefined : 'Please enter your correct Full name !!.';
+            return regex.test(value.trim()) ? undefined : message || 'Please enter this field !!.';
         }
     }
 }
 
     // Email validator
-validator.isEmail = function (selector) {
+validator.isEmail = function (selector, message) {
     return {
         selector,
         test: function (value) {
             let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-            return regex.test(value) ? undefined : 'Please enter your correct email !!.';
+            return regex.test(value) ? undefined : message || 'Please enter this field !!.';
         }
     }
 }
@@ -57,6 +57,16 @@ validator.isPassword = function (selector, number) {
         selector,
         test: function (value) {
             return value.length >= number ? undefined : `Create password (Min: ${number} character) !!.`;
+        }
+    }
+}
+
+    // confirm input:
+validator.isConfirm = function (selector, confirm, message) {
+    return {
+        selector,
+        test: function (value) {
+            return value === confirm() ? undefined : message || 'Please enter this field !!.';
         }
     }
 }

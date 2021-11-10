@@ -59,3 +59,9 @@ FORM VALIDATION:
         search gg: js email regex   ==> /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
     // Password:
         validator.password('#password',6) ==> với 6 = munber là giá trị độ dài tối thiểu.
+    // confirm password:
+        password có gì thì nó phải có đó:
+            ==> tức function  truyền vào phải return ra một giá trị tương đương.
+            ==> test: nếu value === giá trị hàm truyền vào return ra  k có lỗi và ngược lại
+        ==> giá trị return hàm truyền vào: return document.querySelector('#form-1 #password').value;
+        ==> để sử dụng lại nhiều lần ==> thêm tham số thứ 3 vao là message lỗi.

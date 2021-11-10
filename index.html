@@ -51,9 +51,12 @@
             errorSelector: '.form-message',
             classError: 'invalid',
             rules: [
-              validator.isRequired('#fullname'),
-              validator.isEmail('#email'),
+              validator.isRequired('#fullname', 'Please enter your correct Full name !!.'),
+              validator.isEmail('#email', 'Please enter your correct email !!.'),
               validator.isPassword('#password', 8),
+              validator.isConfirm('#password_confirmation', function(){
+                return document.querySelector('#form-1 #password').value;
+              }, 'Re-enter your password correctly !!.')
             ]
           })
         </script>
