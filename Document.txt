@@ -1,0 +1,61 @@
+FORM VALIDATION:
+    - FORM LOG IN; FROM SIGN IN; 
+    - CÁC CẢNH BÁO KHI HÀNH ĐỘNG SAI NHƯ NHẬP SAI MÀ TAGER RA NGOÀI.
+    - CẢNH BÁO SẼ ĐƯỢC GỌI Ở FORM-MANAGED.
+
+    - TAGER:
+        - create a file validator: sử dụng lại nhiều lần.
+        - chỉ cần sử dụng trường id để sử dụng lại file validator cho các form tương tự.
+- BEGIN:
+    - tạo link tương ứng js.
+    - tạo thẻ js có validator truyền vào một {} ==> {
+        form: '#form-1',
+        rules: [
+            validator.isRequired('#fullname'),
+            validator.isEmail('#email'),
+        ]
+    }
+    - muốn lấy event trên elements cần lấy ==> phải lấy ra được thẻ đó trước.
+    - ở file validator:
+        - tạo ham validator lấy ra thẻ formElement = thẻ form tổng. dựa vào tham số truyền vào options.form 
+        - Hai Phan tu:  validator.isRequired
+                        validator.isEmail
+                        ===> 2 ham ===> goi den qua options.rules
+                        ===> return cho 2 ham tren 1 {} 
+                        ===> {} chứa: selector và function test : ==> selector là đối số truyền vào (là id một thẻ html) và hàm test để kiểm tra hành động người dùng.
+        - options.rules ==> lấy được ra {} rules   
+            ==> lập qua options.rules bằng forEach ==> lấy ra được từng rules 
+            ==> rules.selector ==> lấy ra đc ID.
+        - var inputElement để tạo ra elements input khi lập qua bằng forEach 
+            ==> thông qua formElement chứ k phải document để khỏi trùng lập nếu nó có nhiều form.
+        - nếu tồn tại inputElement ==> lắng nghe sự kiện onblue của nó:
+            - khi onblur:
+                ==> lấy được inputElement.value
+                ==> lấy được rule.test
+                    ==> từ đó có thể kiểm tra liệu người dùng có nhập hay chưa.
+            - function test:
+                - truyền vào đối số value
+                - đặt nguyên tắt cho rules khi có lỗi thì trả ra lỗi
+                - khi k có lỗi ==> k trả gì cả.
+                - mỗi inputElement sẽ có một test khác nhau do tính chất chúng khác nhau.
+                - return ra : return value.trim() ? undefined : 'vui lòng nhập trường này!!'
+                    ==> trim() để loại bỏ dấu cách
+            - onblur tạo biến errorMessage:
+                - có hàm test và đối số là value,
+            - hiện lỗi: 
+                - cần tìm đến thẻ form-manager thuộc input đang onblur
+                    ==> từ thẻ inputelement đang onblur gọi đến parentElement ==> để gọi đến thẻ cha của nó
+                    ==> .querySelect để tìm đến thẻ đó.
+                - tại onblur if (errorMessage) = errorElement.innerText = errorMessage ngược lại thì rỗng
+                - cùng với đó add và rm class vào để hiển thị màu đỏ thông báo cho thẻ cha của thẻ inputelement
+            ===> NHƯNG việc hiện lỗi này sẽ diễn ra thường xuyên 
+                ==> ta tạo hàm riêng sử lý việc này.
+    - Oninput để khi người dùng nhập sẽ ẩn thông báo.
+            - Oninput ==> xóa class và xóa errorMessage.
+            - tạo ra key errorSelector : 'form-message'
+            ==> gọi đến quá options.errorSelect
+
+    // Check Email:
+        search gg: js email regex   ==> /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+    // Password:
+        validator.password('#password',6) ==> với 6 = munber là giá trị độ dài tối thiểu.

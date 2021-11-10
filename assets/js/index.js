@@ -1,71 +1,62 @@
-// hàm validator (viết hoa vì muốn đưa nó về la một đối tượng contructer function())
-function validator(options) {
-    const formELement = document.querySelector(options.form);
-
-    //function handler validator ERROR:
-    function validate(inputElement, rule) {
-        const errorElement = inputElement.parentElement.querySelector(options.errorSelector);
-        const errorMessage = rule.test(inputElement.value);
-            if (errorMessage) {
-                errorElement.innerText = errorMessage;
-                inputElement.parentElement.classList.add('invalid')
-            }else {
-                errorElement.innerText = '';
-                inputElement.parentElement.classList.remove('invalid')
-            }
-    }
-
-    // EVEN onblur elements input:
-    if (formELement){
-        options.rules.forEach(rule => {
-            const inputElement = formELement.querySelector(rule.selector);
+function validator (options) {
+    const formElement = document.querySelector(options.form);
+    if (formElement){
+        options.rules.forEach( (rule) => {
+            const inputElement = formElement.querySelector(rule.selector);
             if (inputElement){
-                // handler onblur
-                inputElement.onblur = function () {
-                    validate(inputElement, rule)
+                inputElement.onblur = () => {
+                    errorMessage(inputElement, rule, options)
                 }
-
-                // handler oninput
-                inputElement.oninput =  function () {
-                    const errorElement = inputElement.parentElement.querySelector(options.errorSelector);
-                    inputElement.parentElement.classList.remove('invalid')
-                    errorElement.innerText = '';
-
+                inputElement.oninput = () => {
+                    errorMessage(inputElement, rule, options)
                 }
             }
-        });
+        })
     }
 }
 
+//hanler ERROR Message:
+function errorMessage (inputElement, rule, options) {
+    const errorCheck = rule.test(inputElement.value);
+    const errorElement = inputElement.parentElement.querySelector(options.errorSelector);
+    if (errorCheck){
+        errorElement.innerText = errorCheck;
+        inputElement.parentElement.classList.add(options.classError);
+    }else{
+        errorElement.innerText = '';
+        inputElement.parentElement.classList.remove(options.classError);
+    }
+}
 
-// function rules 
-    // fullname
+// rule      
+    // full name validator
 validator.isRequired = function (selector) {
     return {
         selector,
         test: function (value) {
-            return value.trim() ? undefined : 'vui lòng nhập trường này!!'
+            let regex = /[^a-z0-9A-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/u;
+            return regex.test(value.trim()) ? undefined : 'Please enter your correct Full name !!.';
         }
     }
 }
 
-    // Email
+    // Email validator
 validator.isEmail = function (selector) {
     return {
         selector,
-        test: function (value){
-            var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-            return regex.test(value)  ? undefined : 'Email address is not valid'
+        test: function (value) {
+            let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            return regex.test(value) ? undefined : 'Please enter your correct email !!.';
         }
     }
 }
 
-    // Passwork:
-validator.password = function (selector, number) {
+    // password validator
+validator.isPassword = function (selector, number) {
     return {
         selector,
         test: function (value) {
-            return value.length >= number ? undefined : `Create password (Min: ${number} character)`;
+            return value.length >= number ? undefined : `Create password (Min: ${number} character) !!.`;
         }
     }
 }

@@ -49,10 +49,11 @@
           validator ({
             form: '#form-1',
             errorSelector: '.form-message',
+            classError: 'invalid',
             rules: [
               validator.isRequired('#fullname'),
               validator.isEmail('#email'),
-              validator.password('#password',6),
+              validator.isPassword('#password', 8),
             ]
           })
         </script>
