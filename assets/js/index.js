@@ -1,7 +1,25 @@
+    var saveRules = {}
 function validator (options) {
     const formElement = document.querySelector(options.form);
     if (formElement){
+        // handle onsubmit:
+        formElement.onsubmit = function (event) {
+            event.preventDefault();
+            options.rules.forEach( (rule) => {
+                const inputElement = formElement.querySelector(rule.selector);
+                errorMessage(inputElement, rule, options);
+            })
+        }
+
         options.rules.forEach( (rule) => {
+            //rules:
+            if (Array.isArray(saveRules[rule.selector])){
+                saveRules[rule.selector].push(rule.test);
+            }else {
+                saveRules[rule.selector] = [rule.test];
+            }
+
+            // handler event:
             const inputElement = formElement.querySelector(rule.selector);
             if (inputElement){
                 inputElement.onblur = () => {
@@ -17,8 +35,15 @@ function validator (options) {
 
 //hanler ERROR Message:
 function errorMessage (inputElement, rule, options) {
-    const errorCheck = rule.test(inputElement.value);
     const errorElement = inputElement.parentElement.querySelector(options.errorSelector);
+    const rules = saveRules[rule.selector];
+    var errorCheck;
+
+    for (let i = 0; i < rules.length; i++) {
+        errorCheck = rules[i](inputElement.value);
+        if (errorCheck) break;
+    }
+
     if (errorCheck){
         errorElement.innerText = errorCheck;
         inputElement.parentElement.classList.add(options.classError);
