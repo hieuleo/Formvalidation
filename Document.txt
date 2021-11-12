@@ -82,4 +82,19 @@ FORM VALIDATION:
     - e.preventDefault(); ==> bỏ hành vi mặt định của even này.
     - Lập qua tường rules và báo lỗi nếu có:
         - tạo biến inputElement ==> validate luôn:
-    - 
+- THỰC TẾ: click vao onsubmit:  
+    - cần lấy ra được tất cả các thông tin được điền vào.   
+    - tạo một biến boolean trong onsubmit: isValid ==> nếu 1 biến lỗi thì nó là false: (BIẾN NÀY ĐẶT NGOÀI VÒNG forEach CỦA ON_SUBMIT)
+    - validate() ==> return ra một boolean. ==> false nếu có lỗi.
+    - gắn biến (isRuleValid) cho return validate() ==> nó false ==> cho isFormValid có lỗi.
+    - khi không có lỗi : 
+        - if (typeof options.onSubmit === 'function') thì :
+            - tạo biến lấy ra các input bằng: enableInput = formElement.querySelectAll('[name]:not([disabled])') ==> lấy ra tất cả các input  có trường name
+            - vì enableInput là một notelist nên k có các phương thức như reduce ==> cần chuyển nó đến array: fromValue = Array.from(enableInput);
+            - sử dụng reduce để tạo ra một object output:
+            - return :(result[input.name] = input.value) && result;
+            ==> truyền vào một key object khi lập qua && result để trả về chính nó.
+        - mục đích của phần này là lấy ra được object nó sẽ là output được gởi đi thông qua hàm onSubmit được tạo tại index.html
+            ==> hàm onSubmit sẽ thực hiện hàm call API đến server.
+        - else (): thì submits với hành vì mặt định của html: 
+        

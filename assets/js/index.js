@@ -4,11 +4,30 @@ function validator (options) {
     if (formElement){
         // handle onsubmit:
         formElement.onsubmit = function (event) {
+            var isFormValid = false;
             event.preventDefault();
+
             options.rules.forEach( (rule) => {
                 const inputElement = formElement.querySelector(rule.selector);
                 errorMessage(inputElement, rule, options);
+                const isErrorValid = errorMessage(inputElement, rule, options);
+                if (isErrorValid) {
+                    isFormValid = true;
+                }
             })
+            
+            //handler outputs: ---> return server:
+            if (!isFormValid) {
+                if (typeof options.onSubmit === 'function') {
+                    const enableInput = formElement.querySelectorAll('[name]:not([disabled])')
+                    const enableInputArray = Array.from(enableInput).reduce(function(result, element) {
+                        return (result[element.name] = element.value) && result;
+                    },{})
+                    options.onSubmit(enableInputArray)
+                }else {
+                    formElement.submit();
+                }
+            }
         }
 
         options.rules.forEach( (rule) => {
@@ -51,16 +70,28 @@ function errorMessage (inputElement, rule, options) {
         errorElement.innerText = '';
         inputElement.parentElement.classList.remove(options.classError);
     }
+
+    return !!errorCheck;
 }
 
 // rule      
     // full name validator
-validator.isRequired = function (selector, message) {
+validator.isFullName = function (selector, message) {
     return {
         selector,
         test: function (value) {
             let regex = /[^a-z0-9A-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/u;
             return regex.test(value.trim()) ? undefined : message || 'Please enter this field !!.';
+        }
+    }
+}
+
+    // Required validator
+validator.isRequired = function (selector, message) {
+    return {
+        selector,
+        test: function (value) {
+            return value ? undefined : message || 'Please enter this field !!.';
         }
     }
 }
