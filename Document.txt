@@ -84,7 +84,7 @@ FORM VALIDATION:
         - tạo biến inputElement ==> validate luôn:
 - THỰC TẾ: click vao onsubmit:  
     - cần lấy ra được tất cả các thông tin được điền vào.   
-    - tạo một biến boolean trong onsubmit: isValid ==> nếu 1 biến lỗi thì nó là false: (BIẾN NÀY ĐẶT NGOÀI VÒNG forEach CỦA ON_SUBMIT)
+    - tạo một biến boolean trong onsubmit: isValid ==> nếu 1 biến lỗi thì nó là false:
     - validate() ==> return ra một boolean. ==> false nếu có lỗi.
     - gắn biến (isRuleValid) cho return validate() ==> nó false ==> cho isFormValid có lỗi.
     - khi không có lỗi : 
@@ -97,4 +97,28 @@ FORM VALIDATION:
         - mục đích của phần này là lấy ra được object nó sẽ là output được gởi đi thông qua hàm onSubmit được tạo tại index.html
             ==> hàm onSubmit sẽ thực hiện hàm call API đến server.
         - else (): thì submits với hành vì mặt định của html: 
-        
+- SỬ LÝ hàm không bắt buộc nhập: ==> như trên thì sẽ trả về object rỗng.
+    - Nguyên nhân: vì return gắn phần tử đứng trước && theo logic thì nó là false ==> nó làm hỏng code return ==> nó return ra gá trị ban đầu.
+    - sửa : gắn nó trươc khi return: result[input.name] = input.value
+        return result;
+- Sử Lý : thẻ inputElement nằm trong các thẻ khác nên parentElement không gặp được thẻ hiện thông báo:
+    - Cần lấy ra parentElement có formGroup ở bất cứ cấp nào.
+    - tạo hàm getParent:
+        - tham số truyền vào: element ( là thẻ inputElement đã có) ; selector ( khai báo để sác định được formGroup là ông nào);
+        - dùng vòng lập: while (vòng lập vô hạng với đk if)
+            - while ( element.parentElement) ==> đkiện là có thẻ cha bên ngoài element.
+            - khi lập : kiểm tra element.parentElement có formGroup hay k nếu k lập ra ngoài tiếp tục.
+            - trong DOM có Method : matches() ==> giúp kiểm tra thẻ đó có matches với selector đang tìm không.
+            - nếu nó matches với selector ==> return ra elements.parentElement
+            - khi lập nó sẽ gắn element = element.parentElement; 
+            - thay thế các : inputElement.parentElement = getParent(inputElement, options.selectorParent);
+- Sử lý checkbox; radio........
+    - VD: thẻ input: name="gender" type="radio";
+    - kiểm tra ở hàm lập các input (validator) ==> ở vòng lập for dùng switch case:
+        - switch (inputElement.type) ==> kiểm tra kiểu thẻ.
+        - khi case là checkbox or radio :
+            errorMessage = rules[i](      
+                    );
+            - lấy ra document.querySelect(rule.selector + ':checked') ==> có checked;
+        - default : còn lại : 
+            - sử lý như code ban đầu

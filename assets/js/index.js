@@ -21,7 +21,8 @@ function validator (options) {
                 if (typeof options.onSubmit === 'function') {
                     const enableInput = formElement.querySelectorAll('[name]:not([disabled])')
                     const enableInputArray = Array.from(enableInput).reduce(function(result, element) {
-                        return (result[element.name] = element.value) && result;
+                        result[element.name] = element.value;
+                        return result;
                     },{})
                     options.onSubmit(enableInputArray)
                 }else {
@@ -52,9 +53,21 @@ function validator (options) {
     }
 }
 
+//get parentElement:
+function getParentElement (element, selector) {
+    while (element.parentElement){
+        if (element.parentElement.matches(selector)){
+            return element.parentElement;
+        }
+        element = element.parentElement;
+    }
+}
+
+
 //hanler ERROR Message:
 function errorMessage (inputElement, rule, options) {
-    const errorElement = inputElement.parentElement.querySelector(options.errorSelector);
+    const elementParent = getParentElement(inputElement, options.selectorParent);
+    const errorElement = elementParent.querySelector(options.errorSelector);
     const rules = saveRules[rule.selector];
     var errorCheck;
 
@@ -65,10 +78,10 @@ function errorMessage (inputElement, rule, options) {
 
     if (errorCheck){
         errorElement.innerText = errorCheck;
-        inputElement.parentElement.classList.add(options.classError);
+        elementParent.classList.add(options.classError);
     }else{
         errorElement.innerText = '';
-        inputElement.parentElement.classList.remove(options.classError);
+        elementParent.classList.remove(options.classError);
     }
 
     return !!errorCheck;
