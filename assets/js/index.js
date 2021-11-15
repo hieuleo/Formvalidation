@@ -1,6 +1,6 @@
-    var saveRules = {}
+var saveRules = {}
 function validator (options) {
-    const formElement = document.querySelector(options.form);
+    var formElement = document.querySelector(options.form);
     if (formElement){
         // handle onsubmit:
         formElement.onsubmit = function (event) {
@@ -9,8 +9,8 @@ function validator (options) {
 
             options.rules.forEach( (rule) => {
                 const inputElement = formElement.querySelector(rule.selector);
-                errorMessage(inputElement, rule, options);
-                const isErrorValid = errorMessage(inputElement, rule, options);
+                errorMessage(inputElement, rule, options, formElement);
+                const isErrorValid = errorMessage(inputElement, rule, options, formElement);
                 if (isErrorValid) {
                     isFormValid = true;
                 }
@@ -21,10 +21,40 @@ function validator (options) {
                 if (typeof options.onSubmit === 'function') {
                     const enableInput = formElement.querySelectorAll('[name]:not([disabled])')
                     const enableInputArray = Array.from(enableInput).reduce(function(result, element) {
-                        result[element.name] = element.value;
+                        switch (element.type) {
+                            case 'checkbox':
+                                if (element.checked) {
+                                    if (!Array.isArray(result[element.name])) {
+                                        result[element.name] = [];
+                                    }
+                                    result[element.name].push(element.value);
+                                }
+                                break;
+                            case 'radio':
+                                if (element.checked) {
+                                    result[element.name] = element.value;
+                                }
+                                break;
+                            
+                            case 'file':
+                                result[element.name] = element.files;
+                                break;
+                            default:
+                                result[element.name] = element.value;
+                                break;
+                            }
                         return result;
                     },{})
-                    options.onSubmit(enableInputArray)
+                    // options.onSubmit(enableInputArray)
+
+
+                    // test demo request data to server:
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    var testRequest = ''
+                    for (const i in enableInputArray) {
+                        testRequest = testRequest + ` ${i}: ${enableInputArray[i]}|| `
+                    }
+                    options.onSubmit(testRequest)
                 }else {
                     formElement.submit();
                 }
@@ -40,15 +70,17 @@ function validator (options) {
             }
 
             // handler event:
-            const inputElement = formElement.querySelector(rule.selector);
-            if (inputElement){
-                inputElement.onblur = () => {
-                    errorMessage(inputElement, rule, options)
+            const inputElements = formElement.querySelectorAll(rule.selector);
+            Array.from(inputElements).forEach(function(inputElement) {
+                if (inputElement){
+                    inputElement.onblur = () => {
+                        errorMessage(inputElement, rule, options, formElement)
+                    }
+                    inputElement.oninput = () => {
+                        errorMessage(inputElement, rule, options, formElement)
+                    }
                 }
-                inputElement.oninput = () => {
-                    errorMessage(inputElement, rule, options)
-                }
-            }
+            })
         })
     }
 }
@@ -65,15 +97,24 @@ function getParentElement (element, selector) {
 
 
 //hanler ERROR Message:
-function errorMessage (inputElement, rule, options) {
+function errorMessage (inputElement, rule, options, formElement) {
     const elementParent = getParentElement(inputElement, options.selectorParent);
     const errorElement = elementParent.querySelector(options.errorSelector);
     const rules = saveRules[rule.selector];
     var errorCheck;
 
     for (let i = 0; i < rules.length; i++) {
-        errorCheck = rules[i](inputElement.value);
-        if (errorCheck) break;
+        switch (inputElement.type){
+            case 'checkbox' :
+            case 'radio' :
+                errorCheck = rules[i](
+                    formElement.querySelector(rule.selector + ':checked')
+                );
+                break;
+            default:
+                errorCheck = rules[i](inputElement.value);
+            }
+            if (errorCheck) break;
     }
 
     if (errorCheck){

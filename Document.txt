@@ -2,12 +2,10 @@ FORM VALIDATION:
     - FORM LOG IN; FROM SIGN IN; 
     - CÁC CẢNH BÁO KHI HÀNH ĐỘNG SAI NHƯ NHẬP SAI MÀ TAGER RA NGOÀI.
     - CẢNH BÁO SẼ ĐƯỢC GỌI Ở FORM-MANAGED.
-
     - TAGER:
         - create a file validator: sử dụng lại nhiều lần.
         - chỉ cần sử dụng trường id để sử dụng lại file validator cho các form tương tự.
     - BEGIN:
-        - tạo link tương ứng js.
         - tạo thẻ js có validator truyền vào một {} ==> {
             form: '#form-1',
             rules: [
@@ -15,110 +13,52 @@ FORM VALIDATION:
               validator.isEmail('#email'),
             ]
         }
-        - muốn lấy event trên elements cần lấy ==> phải lấy ra được thẻ đó trước.
-        - ở file validator:
-            - tạo ham validator lấy ra thẻ formElement = thẻ form tổng. dựa vào tham số truyền vào options.form 
+        - file validator:
             - Hai Phan tu:  validator.isRequired
                             validator.isEmail
-                            ===> 2 ham ===> goi den qua options.rules
-                            ===> return cho 2 ham tren 1 {} 
-                            ===> {} chứa: selector và function test : ==> selector là đối số truyền vào (là id một thẻ html) và hàm test để kiểm tra hành động người dùng.
             - options.rules ==> lấy được ra {} rules   
-                ==> lập qua options.rules bằng forEach ==> lấy ra được từng rules 
-                ==> rules.selector ==> lấy ra đc ID.
             - var inputElement để tạo ra elements input khi lập qua bằng forEach 
-                ==> thông qua formElement chứ k phải document để khỏi trùng lập nếu nó có nhiều form.
             - nếu tồn tại inputElement ==> lắng nghe sự kiện onblue của nó:
                 - khi onblur:
-                    ==> lấy được inputElement.value
-                    ==> lấy được rule.test
-                        ==> từ đó có thể kiểm tra liệu người dùng có nhập hay chưa.
                 - function test:
-                    - truyền vào đối số value
-                    - đặt nguyên tắt cho rules khi có lỗi thì trả ra lỗi
-                    - khi k có lỗi ==> k trả gì cả.
-                    - mỗi inputElement sẽ có một test khác nhau do tính chất chúng khác nhau.
-                    - return ra : return value.trim() ? undefined : 'vui lòng nhập trường này!!'
-                        ==> trim() để loại bỏ dấu cách
                 - onblur tạo biến errorMessage:
-                    - có hàm test và đối số là value,
                 - hiện lỗi: 
-                    - cần tìm đến thẻ form-manager thuộc input đang onblur
-                        ==> từ thẻ inputelement đang onblur gọi đến parentElement ==> để gọi đến thẻ cha của nó
-                        ==> .querySelect để tìm đến thẻ đó.
-                    - tại onblur if (errorMessage) = errorElement.innerText = errorMessage ngược lại thì rỗng
-                    - cùng với đó add và rm class vào để hiển thị màu đỏ thông báo cho thẻ cha của thẻ inputelement
-                ===> NHƯNG việc hiện lỗi này sẽ diễn ra thường xuyên 
-                    ==> ta tạo hàm riêng sử lý việc này.
         - Oninput để khi người dùng nhập sẽ ẩn thông báo.
-                - Oninput ==> xóa class và xóa errorMessage.
-                - tạo ra key errorSelector : 'form-message'
-                ==> gọi đến quá options.errorSelect
-
         // Check Email:
             search gg: js email regex   ==> /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
         // Password:
             validator.password('#password',6) ==> với 6 = munber là giá trị độ dài tối thiểu.
 - TRƯỜNG HỢP 1 FIELD CÓ NHIỀU RULE:
-    - nếu ta gọi 1 field bằng 2 rules trở lên thông thường nếu có 2 rules trở lên thì field chỉ nhận rules sau cùng được gọi đến
-    ==> vì nó dùng Loop để lập qua các rules được bạn gọi(forEach) và toán tử gán cho sụ kiện onblur và khi đó nó lập tiếp và gán lại bằng rules đứng sau cùng cho sự kiện của thẻ đó.
-    - cách làm nhiều rules cho một thẻ:
-        - đầu tiên tạo biến ==> phải lưu được tất cả các rules khi nó lập qua: (saveRules)
-            - đầu tiên khi đi qua forEach: khai báo saveRules[rule.selector] = rule.test để lưu lại các rule
-            ==> tuy nhiên gắn bằng dấu bằng thì nó sẽ bị đè 
-            ==> Vì đâu tiên nó chưa được gán saveRules[rule.selector] ==> mãng này là undefined
-            ==> khi nó undefined (tức nó không phải mảng) thì gán cho nó là một mảng ==> saveRules[rule.selector] = [rule.test]
-            ==> còn khi nó không undefined tức đã được gán rồi thì push.(rule.test)
-            ==> Giai Thích: saveRules là 1 object còn các phần tử của nó là mảng ==> nếu nó chưa là mảng thì tạo mãng còn nếu dã làm mảng thì push() vào mảng đó.
-        - Đã có list các rules ==> cần lấy nó ra khi onblur hoặc oninput.
-            - ở hàm sử lý:
-                - tạo biến = lấy ra key [rule.selector] trong saveRules khi có sự kiện trên thẻ:
-                - khi đó có được rules của thẻ đó và nó làm mảng ==> lập qua nó.
-                - bỏ errorMessage vào vòng for:
-                    - gắn nó : = rule[i] tức là function test  (inputElement.value) thông số truyền vào của errorMessage.
-                    if (errorMessage) break; để dùng khi có lỗi
-                ==> nó sẽ thông báo từng lỗi nếu có khi có nhiều rules cùng một FIELD.
--  SỬ LÝ onsubmit:  
-    - e.preventDefault(); ==> bỏ hành vi mặt định của even này.
-    - Lập qua tường rules và báo lỗi nếu có:
-        - tạo biến inputElement ==> validate luôn:
+- handler onsubmit:  
 - THỰC TẾ: click vao onsubmit:  
-    - cần lấy ra được tất cả các thông tin được điền vào.   
-    - tạo một biến boolean trong onsubmit: isValid ==> nếu 1 biến lỗi thì nó là false:
-    - validate() ==> return ra một boolean. ==> false nếu có lỗi.
-    - gắn biến (isRuleValid) cho return validate() ==> nó false ==> cho isFormValid có lỗi.
-    - khi không có lỗi : 
-        - if (typeof options.onSubmit === 'function') thì :
-            - tạo biến lấy ra các input bằng: enableInput = formElement.querySelectAll('[name]:not([disabled])') ==> lấy ra tất cả các input  có trường name
-            - vì enableInput là một notelist nên k có các phương thức như reduce ==> cần chuyển nó đến array: fromValue = Array.from(enableInput);
-            - sử dụng reduce để tạo ra một object output:
-            - return :(result[input.name] = input.value) && result;
-            ==> truyền vào một key object khi lập qua && result để trả về chính nó.
-        - mục đích của phần này là lấy ra được object nó sẽ là output được gởi đi thông qua hàm onSubmit được tạo tại index.html
-            ==> hàm onSubmit sẽ thực hiện hàm call API đến server.
-        - else (): thì submits với hành vì mặt định của html: 
-- SỬ LÝ hàm không bắt buộc nhập: ==> như trên thì sẽ trả về object rỗng.
-    - Nguyên nhân: vì return gắn phần tử đứng trước && theo logic thì nó là false ==> nó làm hỏng code return ==> nó return ra gá trị ban đầu.
-    - sửa : gắn nó trươc khi return: result[input.name] = input.value
-        return result;
-- Sử Lý : thẻ inputElement nằm trong các thẻ khác nên parentElement không gặp được thẻ hiện thông báo:
+- handler hàm không bắt buộc nhập: ==> như trên thì sẽ trả về object rỗng.
+- handler : thẻ inputElement nằm trong các thẻ khác nên parentElement không gặp được thẻ hiện thông báo.
     - Cần lấy ra parentElement có formGroup ở bất cứ cấp nào.
     - tạo hàm getParent:
         - tham số truyền vào: element ( là thẻ inputElement đã có) ; selector ( khai báo để sác định được formGroup là ông nào);
         - dùng vòng lập: while (vòng lập vô hạng với đk if)
-            - while ( element.parentElement) ==> đkiện là có thẻ cha bên ngoài element.
-            - khi lập : kiểm tra element.parentElement có formGroup hay k nếu k lập ra ngoài tiếp tục.
-            - trong DOM có Method : matches() ==> giúp kiểm tra thẻ đó có matches với selector đang tìm không.
-            - nếu nó matches với selector ==> return ra elements.parentElement
-            - khi lập nó sẽ gắn element = element.parentElement; 
-            - thay thế các : inputElement.parentElement = getParent(inputElement, options.selectorParent);
-- Sử lý checkbox; radio........
-    - VD: thẻ input: name="gender" type="radio";
+- handler checkbox; radio........
     - kiểm tra ở hàm lập các input (validator) ==> ở vòng lập for dùng switch case:
-        - switch (inputElement.type) ==> kiểm tra kiểu thẻ.
+        - switch (inputElement.type) ==> kiểm tra đầu vào
         - khi case là checkbox or radio :
             errorMessage = rules[i](      
                     );
             - lấy ra document.querySelect(rule.selector + ':checked') ==> có checked;
-        - default : còn lại : 
-            - sử lý như code ban đầu
+        - default : còn lại 
+    - lỗi : không bỏ errorMessage khi oninput:
+        - handler:
+            - dùng querySelectorAll: cho inputElement tại sự kiện oninput
+            - chuyển từ notelist ==> array ==> dùng forEach lập qua : đưa code handler event dom vào vòng forEach.
+    - Output ra của from này luôn là giá trị đứng cuối:
+        - handler: 
+            - dùng switch case khi reduce lập qua các phần tử có property la name
+- thẻ selector:
+    - logic giống với radio/checkbox:
+- thẻ checkbox:
+    - Lỗi: k thể nhận hết các giá trị khi dùng checkbox.
+    - handler:
+        - case riêng cho checkbox:
+            - nếu nó là checked:
+                - nếu nó k phải array: thì gắn cho key bằng 1 array.
+                - key.push array
+- File type:

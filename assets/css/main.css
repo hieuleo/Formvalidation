@@ -108,3 +108,25 @@ html {
 }
   
 
+.form-group.form-group--choose{
+}
+
+.form-group.form-group--choose > div{
+    display: flex;
+    justify-content: center;
+}
+
+.form-group.form-group--choose > div > div {
+    display: flex;
+    align-items: center;
+}
+
+.form-group.form-group--choose > div > div > input {
+    width: 19px;
+}
+
+.form-group.form-group--choose > div > div > span {
+    font-size: 1.4rem;
+    margin: 0 14px 0 10px;
+}
+
